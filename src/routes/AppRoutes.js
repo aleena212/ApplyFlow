@@ -1,33 +1,57 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "../pages/Login/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Application from "../pages/Application/Application";
 
-function AppRoutes() {
-  return (
-    <BrowserRouter>
-      <Routes>
+import UserForm from "../components/UserForm";
 
-<Route path="/" element={<Login />} />
+function AppRoutes() {
+
+return(
+
+<BrowserRouter>
+
+<Routes>
 
 <Route
-path="/dashboard"
-element={<Dashboard />}
+
+path="/"
+
+element={<Login/>}
+
 />
 
 <Route
+
+path="/dashboard"
+
+element={<Dashboard/>}
+
+/>
+
+<Route
+
 path="/application"
-element={<Application />}
+
+element={<Application/>}
+
+/>
+
+<Route
+
+path="/form"
+
+element={<UserForm/>}
+
 />
 
 </Routes>
-    </BrowserRouter>
-  );
+
+</BrowserRouter>
+
+);
+
 }
 
 export default AppRoutes;
