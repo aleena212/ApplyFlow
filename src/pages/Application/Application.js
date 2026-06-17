@@ -36,8 +36,10 @@ const initialData = {
 
   university: "",
   degree: "",
+  cgpa: "",
 
   company: "",
+  role: "",
   years: "",
 
   jobType: "",
@@ -45,7 +47,6 @@ const initialData = {
 
   technologies: [],
 
-  github: "",
   resume: "",
 
   remote: false,
@@ -65,6 +66,34 @@ function Application() {
   const theme = createTheme({
     palette: {
       mode: darkMode ? "dark" : "light",
+
+      primary: {
+        main: "#8E24AA",
+      },
+
+      secondary: {
+        main: "#EC407A",
+      },
+    },
+
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 15,
+
+            padding: "12px",
+          },
+        },
+      },
+
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: 20,
+          },
+        },
+      },
     },
   });
 
@@ -102,14 +131,6 @@ function Application() {
     if (activeStep < steps.length - 1) {
       setActiveStep(activeStep + 1);
     } else {
-      const oldData = JSON.parse(localStorage.getItem("applications")) || [];
-
-      localStorage.setItem(
-        "applications",
-
-        JSON.stringify([...oldData, formData]),
-      );
-
       setOpen(true);
 
       setTimeout(() => {
@@ -125,22 +146,23 @@ function Application() {
   return (
     <ThemeProvider theme={theme}>
       <Box p={5}>
-        <Typography variant="h4" mb={2}>
-          Job Application
-        </Typography>
+        <Box display="flex" justifyContent="space-between" mb={3}>
+          <Typography variant="h4">Job Application</Typography>
 
-        <FormControlLabel
-          control={
-            <Switch
-              checked={darkMode}
-              onChange={(e) => setDarkMode(e.target.checked)}
-            />
-          }
-          label={darkMode ? "Dark Theme" : "Light Theme"}
-        />
+          <Switch
+            checked={darkMode}
+            onChange={(e) => setDarkMode(e.target.checked)}
+          />
+        </Box>
 
-        <Paper sx={{ p: 4 }}>
-          <Typography mb={1}>Application Progress</Typography>
+        <Paper
+          sx={{
+            p: 4,
+
+            boxShadow: 10,
+          }}
+        >
+          <Typography>Application Progress</Typography>
 
           <LinearProgress
             variant="determinate"
@@ -149,12 +171,12 @@ function Application() {
               height: 10,
 
               borderRadius: 5,
+
+              mb: 3,
             }}
           />
 
-          <Typography mt={1}>{Math.round(progress)}% Completed</Typography>
-
-          <Stepper activeStep={activeStep} sx={{ mt: 4 }}>
+          <Stepper activeStep={activeStep}>
             {steps.map((step) => (
               <Step key={step}>
                 <StepLabel>{step}</StepLabel>
@@ -162,7 +184,7 @@ function Application() {
             ))}
           </Stepper>
 
-          <Box mt={5}>
+          <Box mt={4}>
             {activeStep === 0 && (
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -191,6 +213,74 @@ function Application() {
                     label="Phone"
                     name="phone"
                     value={formData.phone}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              </Grid>
+            )}
+
+            {activeStep === 1 && (
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="University"
+                    name="university"
+                    value={formData.university}
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Degree"
+                    name="degree"
+                    value={formData.degree}
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="CGPA"
+                    name="cgpa"
+                    value={formData.cgpa}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              </Grid>
+            )}
+
+            {activeStep === 2 && (
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Company"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Years"
+                    name="years"
+                    value={formData.years}
                     onChange={handleChange}
                   />
                 </Grid>
@@ -239,6 +329,8 @@ function Application() {
                 </Grid>
 
                 <Grid item xs={12}>
+                  <Typography mb={2}>Select Skills</Typography>
+
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -274,12 +366,12 @@ function Application() {
                         }
                       />
                     }
-                    label="Remote Work"
+                    label="Open for Remote Work"
                   />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Button variant="outlined" component="label" fullWidth>
+                  <Button variant="contained" component="label" fullWidth>
                     Upload Resume
                     <input hidden type="file" onChange={handleResume} />
                   </Button>
