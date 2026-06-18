@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
 
 import {
   Box,
@@ -29,31 +30,24 @@ import {
 
 const steps = ["Personal", "Education", "Experience", "Skills", "Review"];
 
-const initialData = {
-  fullName: "",
-  email: "",
-  phone: "",
-
-  university: "",
-  degree: "",
-  cgpa: "",
-
-  company: "",
-  role: "",
-  years: "",
-
-  jobType: "",
-  experienceLevel: "",
-
-  technologies: [],
-
-  resume: "",
-
-  remote: false,
-};
-
 function Application() {
   const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      jobType: "",
+      experienceLevel: "",
+      remote: false,
+    },
+  });
+
+  const formData = watch();
 
   const [darkMode, setDarkMode] = useState(false);
 
@@ -61,71 +55,17 @@ function Application() {
 
   const [open, setOpen] = useState(false);
 
-  const [formData, setFormData] = useState(initialData);
+  const [technologies, setTechnologies] = useState([]);
+
+  const [resume, setResume] = useState("");
 
   const theme = createTheme({
     palette: {
       mode: darkMode ? "dark" : "light",
-
-      primary: {
-        main: "#8E24AA",
-      },
-
-      secondary: {
-        main: "#EC407A",
-      },
-    },
-
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: 15,
-
-            padding: "12px",
-          },
-        },
-      },
-
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            borderRadius: 20,
-          },
-        },
-      },
     },
   });
 
   const progress = (activeStep / (steps.length - 1)) * 100;
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleResume = (e) => {
-    if (e.target.files[0]) {
-      setFormData({
-        ...formData,
-
-        resume: e.target.files[0].name,
-      });
-    }
-  };
-
-  const handleCheckbox = (skill) => {
-    setFormData({
-      ...formData,
-
-      technologies: formData.technologies.includes(skill)
-        ? formData.technologies.filter((item) => item !== skill)
-        : [...formData.technologies, skill],
-    });
-  };
 
   const nextStep = () => {
     if (activeStep < steps.length - 1) {
@@ -143,6 +83,20 @@ function Application() {
     setActiveStep(activeStep - 1);
   };
 
+  const handleResume = (e) => {
+    if (e.target.files[0]) {
+      setResume(e.target.files[0].name);
+    }
+  };
+
+  const toggleSkill = (skill) => {
+    setTechnologies((prev) =>
+      prev.includes(skill)
+        ? prev.filter((item) => item !== skill)
+        : [...prev, skill],
+    );
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box p={5}>
@@ -155,13 +109,7 @@ function Application() {
           />
         </Box>
 
-        <Paper
-          sx={{
-            p: 4,
-
-            boxShadow: 10,
-          }}
-        >
+        <Paper sx={{ p: 4 }}>
           <Typography>Application Progress</Typography>
 
           <LinearProgress
@@ -169,9 +117,7 @@ function Application() {
             value={progress}
             sx={{
               height: 10,
-
               borderRadius: 5,
-
               mb: 3,
             }}
           />
@@ -185,39 +131,33 @@ function Application() {
           </Stepper>
 
           <Box mt={4}>
+            {/* PERSONAL */}
+
             {activeStep === 0 && (
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
                     label="Full Name"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
+                    {...register("fullName", {
+                      required: "Required",
+                    })}
+                    error={!!errors.fullName}
+                    helperText={errors.fullName?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
+                  <TextField fullWidth label="Email" {...register("email")} />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
+                  <TextField fullWidth label="Phone" {...register("phone")} />
                 </Grid>
               </Grid>
             )}
+
+            {/* EDUCATION */}
 
             {activeStep === 1 && (
               <Grid container spacing={3}>
@@ -225,33 +165,21 @@ function Application() {
                   <TextField
                     fullWidth
                     label="University"
-                    name="university"
-                    value={formData.university}
-                    onChange={handleChange}
+                    {...register("university")}
                   />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Degree"
-                    name="degree"
-                    value={formData.degree}
-                    onChange={handleChange}
-                  />
+                  <TextField fullWidth label="Degree" {...register("degree")} />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="CGPA"
-                    name="cgpa"
-                    value={formData.cgpa}
-                    onChange={handleChange}
-                  />
+                  <TextField fullWidth label="CGPA" {...register("cgpa")} />
                 </Grid>
               </Grid>
             )}
+
+            {/* EXPERIENCE */}
 
             {activeStep === 2 && (
               <Grid container spacing={3}>
@@ -259,33 +187,21 @@ function Application() {
                   <TextField
                     fullWidth
                     label="Company"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
+                    {...register("company")}
                   />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Role"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                  />
+                  <TextField fullWidth label="Role" {...register("role")} />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Years"
-                    name="years"
-                    value={formData.years}
-                    onChange={handleChange}
-                  />
+                  <TextField fullWidth label="Years" {...register("years")} />
                 </Grid>
               </Grid>
             )}
+
+            {/* SKILLS */}
 
             {activeStep === 3 && (
               <Grid container spacing={3}>
@@ -293,85 +209,74 @@ function Application() {
                   <FormControl fullWidth>
                     <InputLabel>Job Type</InputLabel>
 
-                    <Select
+                    <Controller
                       name="jobType"
-                      value={formData.jobType}
-                      label="Job Type"
-                      onChange={handleChange}
-                    >
-                      <MenuItem value="Frontend">Frontend</MenuItem>
+                      control={control}
+                      render={({ field }) => (
+                        <Select label="Job Type" {...field}>
+                          <MenuItem value="Frontend">Frontend</MenuItem>
 
-                      <MenuItem value="Backend">Backend</MenuItem>
-
-                      <MenuItem value="UIUX">UI / UX</MenuItem>
-                    </Select>
+                          <MenuItem value="Backend">Backend</MenuItem>
+                        </Select>
+                      )}
+                    />
                   </FormControl>
                 </Grid>
 
                 <Grid item xs={12}>
-                  <RadioGroup
+                  <Controller
                     name="experienceLevel"
-                    value={formData.experienceLevel}
-                    onChange={handleChange}
-                  >
-                    <FormControlLabel
-                      value="Fresher"
-                      control={<Radio />}
-                      label="Fresher"
-                    />
+                    control={control}
+                    render={({ field }) => (
+                      <RadioGroup {...field}>
+                        <FormControlLabel
+                          value="Fresher"
+                          control={<Radio />}
+                          label="Fresher"
+                        />
 
-                    <FormControlLabel
-                      value="Experienced"
-                      control={<Radio />}
-                      label="Experienced"
-                    />
-                  </RadioGroup>
+                        <FormControlLabel
+                          value="Experienced"
+                          control={<Radio />}
+                          label="Experienced"
+                        />
+                      </RadioGroup>
+                    )}
+                  />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Typography mb={2}>Select Skills</Typography>
-
                   <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formData.technologies.includes("React")}
-                        onChange={() => handleCheckbox("React")}
-                      />
-                    }
+                    control={<Checkbox onChange={() => toggleSkill("React")} />}
                     label="React"
                   />
 
                   <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formData.technologies.includes("Node")}
-                        onChange={() => handleCheckbox("Node")}
-                      />
-                    }
+                    control={<Checkbox onChange={() => toggleSkill("Node")} />}
                     label="Node"
                   />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formData.remote}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-
-                            remote: e.target.checked,
-                          })
+                  <Controller
+                    name="remote"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={field.value}
+                            onChange={(e) => field.onChange(e.target.checked)}
+                          />
                         }
+                        label="Remote"
                       />
-                    }
-                    label="Open for Remote Work"
+                    )}
                   />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Button variant="contained" component="label" fullWidth>
+                  <Button component="label" variant="outlined" fullWidth>
                     Upload Resume
                     <input hidden type="file" onChange={handleResume} />
                   </Button>
@@ -379,16 +284,53 @@ function Application() {
               </Grid>
             )}
 
-            <Box mt={5}>
+            {/* REVIEW */}
+
+            {activeStep === 4 && (
+              <Box>
+                <Typography>
+                  Name:
+                  {formData.fullName}
+                </Typography>
+
+                <Typography>
+                  Email:
+                  {formData.email}
+                </Typography>
+
+                <Typography>
+                  Job:
+                  {formData.jobType}
+                </Typography>
+
+                <Typography>
+                  Skills:
+                  {technologies.join(", ")}
+                </Typography>
+
+                <Typography>
+                  Resume:
+                  {resume}
+                </Typography>
+              </Box>
+            )}
+
+            <Box mt={4}>
               {activeStep > 0 && <Button onClick={prevStep}>Back</Button>}
 
-              <Button variant="contained" sx={{ ml: 2 }} onClick={nextStep}>
+              <Button
+                variant="contained"
+                sx={{
+                  ml: 2,
+                }}
+                onClick={handleSubmit(nextStep)}
+              >
                 {activeStep === 4 ? "Submit" : "Next"}
               </Button>
             </Box>
           </Box>
 
-          <Snackbar open={open} autoHideDuration={3000}>
+          <Snackbar open={open}>
             <Alert severity="success">Application Submitted</Alert>
           </Snackbar>
         </Paper>
