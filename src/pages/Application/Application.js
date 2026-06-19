@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useForm, Controller } from "react-hook-form";
+
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { applicationSchema } from "../../validation/applicationSchema";
+
+import { saveApplication } from "../../services/applicationService";
 
 import {
   Box,
@@ -35,14 +42,22 @@ function Application() {
 
   const {
     register,
+
     handleSubmit,
+
     watch,
+
     control,
+
     formState: { errors },
   } = useForm({
+    resolver: yupResolver(applicationSchema),
+
     defaultValues: {
       jobType: "",
+
       experienceLevel: "",
+
       remote: false,
     },
   });
@@ -55,9 +70,9 @@ function Application() {
 
   const [open, setOpen] = useState(false);
 
-  const [technologies, setTechnologies] = useState([]);
-
   const [resume, setResume] = useState("");
+
+  const [technologies, setTechnologies] = useState([]);
 
   const theme = createTheme({
     palette: {
@@ -71,6 +86,14 @@ function Application() {
     if (activeStep < steps.length - 1) {
       setActiveStep(activeStep + 1);
     } else {
+      saveApplication({
+        ...formData,
+
+        resume,
+
+        skills: technologies,
+      });
+
       setOpen(true);
 
       setTimeout(() => {
@@ -112,17 +135,9 @@ function Application() {
         <Paper sx={{ p: 4 }}>
           <Typography>Application Progress</Typography>
 
-          <LinearProgress
-            variant="determinate"
-            value={progress}
-            sx={{
-              height: 10,
-              borderRadius: 5,
-              mb: 3,
-            }}
-          />
+          <LinearProgress variant="determinate" value={progress} />
 
-          <Stepper activeStep={activeStep}>
+          <Stepper activeStep={activeStep} sx={{ mt: 3 }}>
             {steps.map((step) => (
               <Step key={step}>
                 <StepLabel>{step}</StepLabel>
@@ -131,33 +146,39 @@ function Application() {
           </Stepper>
 
           <Box mt={4}>
-            {/* PERSONAL */}
-
             {activeStep === 0 && (
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
                     label="Full Name"
-                    {...register("fullName", {
-                      required: "Required",
-                    })}
+                    {...register("fullName")}
                     error={!!errors.fullName}
                     helperText={errors.fullName?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField fullWidth label="Email" {...register("email")} />
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    {...register("email")}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
                 </Grid>
 
                 <Grid item xs={12}>
-                  <TextField fullWidth label="Phone" {...register("phone")} />
+                  <TextField
+                    fullWidth
+                    label="Phone"
+                    {...register("phone")}
+                    error={!!errors.phone}
+                    helperText={errors.phone?.message}
+                  />
                 </Grid>
               </Grid>
             )}
-
-            {/* EDUCATION */}
 
             {activeStep === 1 && (
               <Grid container spacing={3}>
@@ -179,8 +200,6 @@ function Application() {
               </Grid>
             )}
 
-            {/* EXPERIENCE */}
-
             {activeStep === 2 && (
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -200,8 +219,6 @@ function Application() {
                 </Grid>
               </Grid>
             )}
-
-            {/* SKILLS */}
 
             {activeStep === 3 && (
               <Grid container spacing={3}>
@@ -224,28 +241,6 @@ function Application() {
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Controller
-                    name="experienceLevel"
-                    control={control}
-                    render={({ field }) => (
-                      <RadioGroup {...field}>
-                        <FormControlLabel
-                          value="Fresher"
-                          control={<Radio />}
-                          label="Fresher"
-                        />
-
-                        <FormControlLabel
-                          value="Experienced"
-                          control={<Radio />}
-                          label="Experienced"
-                        />
-                      </RadioGroup>
-                    )}
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
                   <FormControlLabel
                     control={<Checkbox onChange={() => toggleSkill("React")} />}
                     label="React"
@@ -258,24 +253,6 @@ function Application() {
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Controller
-                    name="remote"
-                    control={control}
-                    render={({ field }) => (
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={field.value}
-                            onChange={(e) => field.onChange(e.target.checked)}
-                          />
-                        }
-                        label="Remote"
-                      />
-                    )}
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
                   <Button component="label" variant="outlined" fullWidth>
                     Upload Resume
                     <input hidden type="file" onChange={handleResume} />
@@ -284,45 +261,12 @@ function Application() {
               </Grid>
             )}
 
-            {/* REVIEW */}
-
-            {activeStep === 4 && (
-              <Box>
-                <Typography>
-                  Name:
-                  {formData.fullName}
-                </Typography>
-
-                <Typography>
-                  Email:
-                  {formData.email}
-                </Typography>
-
-                <Typography>
-                  Job:
-                  {formData.jobType}
-                </Typography>
-
-                <Typography>
-                  Skills:
-                  {technologies.join(", ")}
-                </Typography>
-
-                <Typography>
-                  Resume:
-                  {resume}
-                </Typography>
-              </Box>
-            )}
-
             <Box mt={4}>
               {activeStep > 0 && <Button onClick={prevStep}>Back</Button>}
 
               <Button
                 variant="contained"
-                sx={{
-                  ml: 2,
-                }}
+                sx={{ ml: 2 }}
                 onClick={handleSubmit(nextStep)}
               >
                 {activeStep === 4 ? "Submit" : "Next"}
@@ -330,7 +274,7 @@ function Application() {
             </Box>
           </Box>
 
-          <Snackbar open={open}>
+          <Snackbar open={open} autoHideDuration={3000}>
             <Alert severity="success">Application Submitted</Alert>
           </Snackbar>
         </Paper>

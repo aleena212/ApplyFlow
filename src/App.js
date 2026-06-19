@@ -1,23 +1,22 @@
-import { useState } from "react";
-
-import { ThemeProvider, CssBaseline } from "@mui/material";
-
 import AppRoutes from "./routes/AppRoutes";
 
-import getTheme from "./theme/theme";
+import {
+UserProvider
+}
+from "./context/UserContext";
 
-function App() {
-  const [darkMode, setDarkMode] = useState(false);
+function App(){
 
-  const theme = getTheme(darkMode);
+return(
 
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+<UserProvider>
 
-      <AppRoutes darkMode={darkMode} setDarkMode={setDarkMode} />
-    </ThemeProvider>
-  );
+<AppRoutes/>
+
+</UserProvider>
+
+);
+
 }
 
 export default App;

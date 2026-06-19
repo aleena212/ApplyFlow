@@ -1,236 +1,291 @@
 import {
-Box,
-Typography,
-Paper,
-Card,
-CardContent,
-Grid,
-Button,
+  Box,
+  Typography,
+  Paper,
+  Card,
+  CardContent,
+  Grid,
+  Button,
 } from "@mui/material";
+import {
+getApplications
+}
+from "../../services/applicationService";
 
 import {
-useNavigate,
+  useNavigate,
 } from "react-router-dom";
 
+import {
+  useContext,
+} from "react";
+
+import {
+  UserContext,
+} from "../../context/UserContext";
+
 function Dashboard() {
+  const navigate =
+    useNavigate();
 
-const navigate =
-useNavigate();
+  const {
+    user,
+  } =
+    useContext(
+      UserContext
+    );
 
-const applications =
-JSON.parse(
-localStorage.getItem(
-"applications"
-) || "[]"
-);
+  const applications =
+getApplications();
 
-return (
+  return (
+    <Box p={5}>
 
-<Box p={5}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={4}
+      >
 
-<Box
-display="flex"
-justifyContent="space-between"
-alignItems="center"
-mb={4}
->
+        <Box>
 
-<Typography
-variant="h4"
-fontWeight="bold"
->
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+          >
+            Dashboard
+          </Typography>
 
-Dashboard
+          <Typography
+            color="text.secondary"
+            mt={1}
+          >
 
-</Typography>
+            Welcome
 
-<Button
-variant="contained"
-size="large"
+            {" "}
 
-onClick={() =>
-navigate(
-"/application"
-)
-}
->
+            {
 
-Start Application
+              user?.email ||
 
-</Button>
+              "Guest"
 
-</Box>
+            }
 
-<Card
-sx={{
-mb:4,
-p:2
-}}
->
+          </Typography>
 
-<CardContent>
+        </Box>
 
-<Typography
-variant="h6"
->
+        <Button
+          variant="contained"
+          size="large"
+          onClick={() =>
+            navigate(
+              "/application"
+            )
+          }
+        >
+          Start Application
+        </Button>
 
-Total Applications
+      </Box>
 
-</Typography>
+      <Card
+        sx={{
+          mb: 4,
+          p: 2,
+        }}
+      >
 
-<Typography
-variant="h2"
-color="primary"
->
+        <CardContent>
 
-{
-applications.length
-}
+          <Typography variant="h6">
 
-</Typography>
+            Total Applications
 
-</CardContent>
+          </Typography>
 
-</Card>
+          <Typography
+            variant="h2"
+            color="primary"
+          >
 
-{
-applications.length === 0 ? (
+            {
 
-<Paper
-sx={{
-p:5,
-textAlign:
-"center"
-}}
->
+              applications.length
 
-<Typography
-variant="h6"
-mb={2}
->
+            }
 
-No Applications Yet
+          </Typography>
 
-</Typography>
+        </CardContent>
 
-<Button
-variant="outlined"
+      </Card>
 
-onClick={() =>
-navigate(
-"/application"
-)
-}
->
+      {
 
-Create First Application
+        applications.length === 0
 
-</Button>
+        ?
 
-</Paper>
+        (
 
-) : (
+          <Paper
+            sx={{
+              p: 5,
+              textAlign:
+                "center",
+            }}
+          >
 
-<Grid
-container
-spacing={3}
->
+            <Typography
+              variant="h6"
+              mb={2}
+            >
 
-{
-applications.map(
-(
-app,
-index
-)=>(
+              No Applications Yet
 
-<Grid
-item
-xs={12}
-md={6}
-key={index}
->
+            </Typography>
 
-<Paper
-sx={{
-p:3
-}}
->
+            <Button
+              variant="outlined"
+              onClick={() =>
+                navigate(
+                  "/application"
+                )
+              }
+            >
 
-<Typography>
+              Create First Application
 
-<strong>
-Name:
-</strong>
+            </Button>
 
-{" "}
+          </Paper>
 
-{
-app.fullName
-}
+        )
 
-</Typography>
+        :
 
-<Typography>
+        (
 
-<strong>
-Email:
-</strong>
+          <Grid
+            container
+            spacing={3}
+          >
 
-{" "}
+            {
 
-{
-app.email
-}
+              applications.map(
+                (
+                  app,
+                  index
+                ) => (
 
-</Typography>
+                  <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    key={index}
+                  >
 
-<Typography>
+                    <Paper
+                      sx={{
+                        p: 3,
+                      }}
+                    >
 
-<strong>
-University:
-</strong>
+                      <Typography>
 
-{" "}
+                        <strong>
 
-{
-app.university
-}
+                          Name:
 
-</Typography>
+                        </strong>
 
-<Typography>
+                        {" "}
 
-<strong>
-Skills:
-</strong>
+                        {
 
-{" "}
+                          app.fullName
 
-{
-app.skills
-}
+                        }
 
-</Typography>
+                      </Typography>
 
-</Paper>
+                      <Typography>
 
-</Grid>
+                        <strong>
 
-)
-)
+                          Email:
 
-}
+                        </strong>
 
-</Grid>
+                        {" "}
 
-)
+                        {
 
-}
+                          app.email
 
-</Box>
+                        }
 
-);
+                      </Typography>
 
+                      <Typography>
+
+                        <strong>
+
+                          University:
+
+                        </strong>
+
+                        {" "}
+
+                        {
+
+                          app.university
+
+                        }
+
+                      </Typography>
+
+                      <Typography>
+
+                        <strong>
+
+                          Skills:
+
+                        </strong>
+
+                        {" "}
+
+                        {
+
+                          app.skills
+
+                        }
+
+                      </Typography>
+
+                    </Paper>
+
+                  </Grid>
+
+                )
+
+              )
+
+            }
+
+          </Grid>
+
+        )
+
+      }
+
+    </Box>
+  );
 }
 
 export default Dashboard;

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
+
+import { UserContext } from "../../context/UserContext";
 
 import {
   Box,
@@ -28,6 +30,8 @@ import {
 function Login() {
   const navigate = useNavigate();
 
+  const { setUser } = useContext(UserContext);
+
   const {
     register,
     handleSubmit,
@@ -53,11 +57,10 @@ function Login() {
         localStorage.getItem("loggedUsers")
       ) || [];
 
-    const exists =
-      users.some(
-        (user) =>
-          user.email === data.email
-      );
+    const exists = users.some(
+      (user) =>
+        user.email === data.email
+    );
 
     if (exists) {
       setSeverity("warning");
@@ -83,6 +86,9 @@ function Login() {
       JSON.stringify(data)
     );
 
+    // Context API
+    setUser(data);
+
     setSeverity("success");
 
     setMessage(
@@ -92,9 +98,7 @@ function Login() {
     setOpen(true);
 
     setTimeout(() => {
-      navigate(
-        "/dashboard"
-      );
+      navigate("/dashboard");
     }, 1500);
   };
 
@@ -144,12 +148,6 @@ function Login() {
               Smart Job Application Portal
             </Typography>
 
-            <Typography mt={2}>
-              Track applications,
-              manage profiles,
-              and apply faster.
-            </Typography>
-
           </Box>
 
           <Box
@@ -180,7 +178,6 @@ function Login() {
               variant="h4"
               textAlign="center"
               mb={4}
-              fontWeight="bold"
             >
               Welcome Back
             </Typography>
@@ -189,21 +186,18 @@ function Login() {
               fullWidth
               label="Email"
               margin="normal"
-              {...register(
-                "email",
-                {
-                  required:
-                    "Email is required",
+              {...register("email", {
+                required:
+                  "Email required",
 
-                  pattern: {
-                    value:
-                      /^\S+@\S+\.\S+$/,
+                pattern: {
+                  value:
+                    /^\S+@\S+\.\S+$/,
 
-                    message:
-                      "Invalid email",
-                  },
-                }
-              )}
+                  message:
+                    "Invalid email",
+                },
+              })}
               error={
                 !!errors.email
               }
@@ -262,8 +256,12 @@ function Login() {
                     >
 
                       {showPassword
-                        ? <VisibilityOff />
-                        : <Visibility />}
+                        ? (
+                          <VisibilityOff />
+                        )
+                        : (
+                          <Visibility />
+                        )}
 
                     </IconButton>
 
@@ -275,13 +273,13 @@ function Login() {
             <Box
               display="flex"
               justifyContent="space-between"
-              mt={1}
             >
 
               <Controller
                 name="remember"
                 control={control}
                 render={({ field }) => (
+
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -297,6 +295,7 @@ function Login() {
                     }
                     label="Remember"
                   />
+
                 )}
               />
 
@@ -312,7 +311,6 @@ function Login() {
               sx={{
                 mt: 4,
                 height: 55,
-                fontSize: 18,
               }}
               onClick={
                 handleSubmit(
@@ -338,7 +336,9 @@ function Login() {
       >
 
         <Alert severity={severity}>
+
           {message}
+
         </Alert>
 
       </Snackbar>
